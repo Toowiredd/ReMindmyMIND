@@ -31,10 +31,17 @@ def run_silent_command(command):
         raise
 
 def create_venv(venv_path):
-    system_python = "/usr/bin/python3"
+    # Check for available Python versions
+    python_versions = ["/usr/bin/python3", "/usr/local/bin/python3", "/opt/homebrew/bin/python3"]
+    system_python = None
     
-    if not os.path.exists(system_python):
-        raise FileNotFoundError(f"System Python not found at {system_python}")
+    for python in python_versions:
+        if os.path.exists(python):
+            system_python = python
+            break
+    
+    if not system_python:
+        raise FileNotFoundError("No suitable Python version found.")
     
     run_silent_command([system_python, '-m', 'venv', venv_path])
     

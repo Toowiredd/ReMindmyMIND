@@ -22,6 +22,9 @@ try:
 
 except sqlite3.Error as e:
     logging.error(f"Une erreur SQLite est survenue : {e}")
+    logging.error("Erreur lors de la suppression des images traitées et plus anciennes que 7 jours.")
+    logging.error(f"Chemin de la base de données: {db_path}")
+    logging.error(f"Date de suppression: {seven_days_ago}")
 
 finally:
     if conn:

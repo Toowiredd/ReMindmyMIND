@@ -84,8 +84,8 @@ def preprocess_image(image_path):
         logging.error(f"Error preprocessing image {str(image_path)}: {e}")
     return None
 
-def save_to_db_and_json(image_data, json_output_path):
-    """Save data to SQLite database and JSON file."""
+def save_to_db(image_data):
+    """Save data to SQLite database."""
     try:
         db_path = base_dir / 'regular_data.db'
         logging.info(f"Database path: {db_path}")
@@ -110,7 +110,16 @@ def save_to_db_and_json(image_data, json_output_path):
         conn.commit()
 
         logging.debug(f"Data saved to database: {image_data}")
+        
+    except sqlite3.Error as e:
+        logging.error(f"Error saving to database: {e}")
+    finally:
+        conn.close()
+        gc.collect()
 
+def save_to_json(image_data, json_output_path):
+    """Save data to JSON file."""
+    try:
         # Load existing data
         if os.path.exists(json_output_path) and os.path.getsize(json_output_path) > 0:
             with open(json_output_path, 'r') as json_file:
@@ -135,11 +144,8 @@ def save_to_db_and_json(image_data, json_output_path):
 
         logging.debug(f"Data saved to JSON file: {image_data}")
         
-    except sqlite3.Error as e:
-        logging.error(f"Error saving to database: {e}")
-    finally:
-        conn.close()
-        gc.collect()
+    except Exception as e:
+        logging.error(f"Error saving to JSON file: {e}")
 
 class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
@@ -182,7 +188,8 @@ class MyHandler(FileSystemEventHandler):
 
                     logging.debug(f"Processed data: {image_data}")
 
-                    save_to_db_and_json(image_data, json_output_path)
+                    save_to_db(image_data)
+                    save_to_json(image_data, json_output_path)
 
                     # Mark the file as processed
                     processed_files[file_path] = True
