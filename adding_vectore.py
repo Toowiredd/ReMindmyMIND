@@ -19,16 +19,19 @@ processed_ids_path = base_dir / 'processed_ids.json'
 persist_directory = base_dir / 'vectoreDB'
 
 def load_processed_ids():
+    """Load processed document IDs from a JSON file."""
     if processed_ids_path.exists():
         with open(processed_ids_path, 'r') as f:
             return set(json.load(f))
     return set()
 
 def save_processed_ids(processed_ids):
+    """Save processed document IDs to a JSON file."""
     with open(processed_ids_path, 'w') as f:
         json.dump(list(processed_ids), f)
 
 def process_new_documents():
+    """Process new documents, add them to the vector store, and update processed IDs."""
     processed_ids = load_processed_ids()
     embedding_model = OllamaEmbeddings(model='nomic-embed-text')
     
